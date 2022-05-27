@@ -6,7 +6,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import MapView, { Marker } from "react-native-maps";
 import { useDispatch, useSelector } from "react-redux";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
@@ -18,6 +18,14 @@ const Map = () => {
   const destination = useSelector((state) => state["uberReducer"].destination);
   const user = useSelector(selectUser);
   const dispatch = useDispatch();
+  const mapRef = useRef(null);
+
+  useEffect(() => {
+    if (!origin || !destination) return;
+    mapRef.current.fitToSuppliedMarkers(["origin", "destination"], {
+      edgePadding: { top: 50, right: 50, bottom: 50, left: 50 },
+    });
+  }, []);
 
   return (
     <KeyboardAvoidingView
@@ -25,6 +33,7 @@ const Map = () => {
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <MapView
+        ref={mapRef}
         mapType="mutedStandard"
         initialRegion={{
           latitude: origin.location.lat,
@@ -50,6 +59,7 @@ const Map = () => {
           }}
           title={"Origin"}
           description={origin.description}
+          identifier="origin"
         />
         {destination && (
           <Marker
@@ -59,48 +69,10 @@ const Map = () => {
             }}
             title={"Destination"}
             description={destination.description}
+            identifier="destination"
           />
         )}
       </MapView>
-      <Text style={{alignSelf:"center",fontSize:18,marginVertical:9,fontWeight:"500"}}>Hello, {user.email}</Text>
-      <GooglePlacesAutocomplete
-        placeholder="Where to?"
-        onPress={(data, details = null) => {
-          dispatch(
-            setDestination({
-              location: details.geometry.location,
-              description: data.description,
-            })
-          );
-
-          // 'details' is provided when fetchDetails = true
-          // console.log(details.geometry.location.lat);
-        }}
-        styles={{
-          container: {
-            flex: 0,
-            marginHorizontal: 5,
-            marginVertical: 5,
-          },
-
-          textInput: {
-            fontSize: 18,
-            color: "black",
-            marginHorizontal: 10,
-            backgroundColor: "#ECECEC",
-          },
-        }}
-        textInputProps={{ placeholderTextColor: "black" }}
-        fetchDetails={true}
-        returnKeyType={"search"}
-        minLength={2}
-        debounce={400}
-        query={{
-          key: "AIzaSyDbbSwY2NtcjJrJ3wFNIo5psp1Yvoz7fnM",
-          language: "en",
-        }}
-        enablePoweredByContainer={false}
-      />
     </KeyboardAvoidingView>
   );
 };

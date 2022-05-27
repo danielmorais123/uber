@@ -8,10 +8,10 @@ import SelectCar from "../components/SelectCar";
 const MapScreen = () => {
   const Stack = createNativeStackNavigator();
   return (
-    <View style={{ flex: 2 }}>
+    <View style={{ flex: 1 }}>
       <View
         style={{
-          flex: 2,
+          flex: 1,
         }}
       >
         <Map />
@@ -19,6 +19,7 @@ const MapScreen = () => {
       <View
         style={{
           flex: 1,
+          backgroundColor:"white"
         }}
       >
         <Stack.Navigator screenOptions={{ headerShown: false }}>
